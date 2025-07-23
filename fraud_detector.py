@@ -17,17 +17,14 @@ run_analysis = st.button("🔍 Run Fraud Analysis")
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 assert openrouter_api_key, "❌ OPENROUTER_API_KEY not found in environment!"
 
-llm = LLM(
-    provider="openrouter",
-    config={
-        "model": "meta-llama/llama-3.1-8b-instruct",
-        "api_key": openrouter_api_key,
-        "base_url": "https://openrouter.ai/api/v1",
-        "temperature": 0,
-        "max_tokens": 512
-    }
+llm = ChatOpenAI(
+    model="openrouter/meta-llama/llama-3.1-8b-instruct",
+    temperature=0,
+    max_tokens=256,
+    openai_api_key=openrouter_api_key,
+    openai_api_base="https://openrouter.ai/api/v1",
+    timeout=30
 )
-
 # ========================== OUTPUT SCHEMA ==========================
 class RiskAssessment(BaseModel):
     risk_score: float = Field(description="Risk score 0-10", ge=0, le=10)
