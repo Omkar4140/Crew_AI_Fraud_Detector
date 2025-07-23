@@ -3,7 +3,7 @@ from typing import List
 from pydantic import BaseModel, Field
 from crewai import Agent, Task, Crew, Process, LLM
 import streamlit as st
-
+from langchain_openai import ChatOpenAI
 # ========================== STREAMLIT UI ==========================
 st.title("🕵️‍♂️ AI-Powered Fraud Risk Detector")
 customer_name = st.text_input("Customer Name", "TechCorp Solutions")
