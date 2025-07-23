@@ -1,6 +1,5 @@
 streamlit
-crewai
-crewai-tools
+crewai-core
 langchain-openai
 pydantic
 python-dotenv
