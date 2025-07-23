@@ -1,7 +1,7 @@
 import os
 from typing import List
 from pydantic import BaseModel, Field
-from crewai_core import Agent, Task, Crew, Process, LLM
+from crewai import Agent, Task, Crew, Process, LLM
 import streamlit as st
 
 # ========================== STREAMLIT UI ==========================
