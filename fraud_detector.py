@@ -4,16 +4,14 @@ from pydantic import BaseModel, Field
 from crewai import Agent, Task, Crew, Process, LLM
 import streamlit as st
 from langchain_openai import ChatOpenAI
-# ========================== STREAMLIT UI ==========================
+#STREAMLIT UI 
 st.title("🕵️‍♂️ AI-Powered Fraud Risk Detector")
 customer_name = st.text_input("Customer Name", "TechCorp Solutions")
 industry = st.text_input("Industry Sector", "AI Software")
 description = st.text_area("Company Summary", "A fast-growing AI software company...")
 
 run_analysis = st.button("🔍 Run Fraud Analysis")
-
-# ========================== LLM SETUP ==========================
-# Load API key from environment
+#LLM SETUP
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 assert openrouter_api_key, "❌ OPENROUTER_API_KEY not found in environment!"
 
@@ -25,25 +23,23 @@ llm = ChatOpenAI(
     openai_api_base="https://openrouter.ai/api/v1",
     timeout=30
 )
-# ========================== OUTPUT SCHEMA ==========================
+#OUTPUT SCHEMA
 class RiskAssessment(BaseModel):
     risk_score: float = Field(description="Risk score 0-10", ge=0, le=10)
     risk_summary: str = Field(description="Brief risk summary")
     risk_factors: List[str] = Field(description="Top 3 risk factors", min_items=3, max_items=3)
-
-# ========================== AGENT & TASK ==========================
+#AGENT & TASK
 def run_fraud_crew(name, industry, info):
     analyst = Agent(
         role="Senior Fraud Risk Analyst",
         goal=f"Conduct fraud risk analysis for {name} in {industry} sector",
         backstory="Expert in evaluating corporate fraud indicators and compliance risks.",
-        tools=[],  # ✅ No tools = no memory needed
+        tools=[],
         llm=llm,
         verbose=True,
         allow_delegation=False,
         max_iter=1
     )
-
     task = Task(
         description=f"""
         Conduct a fraud risk analysis for {name}, a company in the {industry} sector.
@@ -63,24 +59,20 @@ def run_fraud_crew(name, industry, info):
         agent=analyst,
         output_pydantic=RiskAssessment
     )
-
     crew = Crew(
         agents=[analyst],
         tasks=[task],
         process=Process.sequential,
-        verbose=False  # ✅ safe for Streamlit
+        verbose=False 
     )
 
     return crew.kickoff()
-
-
-# ========================== RUN CREW ON CLICK ==========================
+#RUN CREW ON CLICK
 if run_analysis:
     with st.spinner("Running fraud analysis..."):
         try:
             result = run_fraud_crew(customer_name, industry, description)
 
-            # Handle both pydantic and raw outputs
             if hasattr(result, 'pydantic'):
                 report = result.pydantic
             elif hasattr(result, 'tasks_output') and len(result.tasks_output) > 0:
@@ -88,7 +80,6 @@ if run_analysis:
             else:
                 report = result
 
-            # ✅ Display result
             st.success("✅ Analysis Complete!")
             st.markdown(f"### 🎯 Risk Score: `{report.risk_score}/10`")
             st.markdown(f"**📋 Summary:** {report.risk_summary}")
